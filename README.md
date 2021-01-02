@@ -10,7 +10,7 @@ This is a minimal package for a pure Julia tools I have found useful in working 
 ## Examples
 
 ```julia
-julia> ] add https://github.com/jakewilliami/MultidimensionalTools.jl
+julia> ] add MultidimensionalTools
 
 julia> using MultidimensionalTools
 
