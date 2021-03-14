@@ -1,3 +1,7 @@
+## NOTE:
+# n-dim sparse array?
+# each code word in CodingTheory is a point in an n-dim array
+
 """
     n_adjacencies(dim::Integer) -> Integer
     n_adjacencies(M::AbstractArray{T, N}) -> Integer
