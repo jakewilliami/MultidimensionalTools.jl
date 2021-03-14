@@ -1,10 +1,10 @@
 include(joinpath(dirname(@__DIR__), "src", "MultidimensionalTools.jl"))
-using Documenter, .MyCoolPackage
+using Documenter, .MultidimensionalTools
 
 Documenter.makedocs(
     clean = true,
     doctest = true,
-    modules = Module[MyCoolPackage],
+    modules = Module[MultidimensionalTools],
     repo = "",
     highlightsig = true,
     sitename = "MultidimensionalTools Documentation",
