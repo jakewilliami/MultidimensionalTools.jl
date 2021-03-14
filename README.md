@@ -4,8 +4,11 @@
 
 [![Code Style: Blue][code-style-img]][code-style-url] [![Build Status](https://travis-ci.com/jakewilliami/MultidimensionalTools.jl.svg?branch=master)](https://travis-ci.com/jakewilliami/MultidimensionalTools.jl) ![Project Status](https://img.shields.io/badge/status-maturing-green)
 
+**This package is still developing and may need peer review from mathematicians.**
 
-This is a minimal package for a pure Julia tools I have found useful in working in higher dimensions.  This repository came about from some informal work in [Advent of Code, 2020, days 11 &#38; 17](https://github.com/jakewilliami/scripts/tree/master/julia/Other/advent_of_code/2020)
+**Important note: still being defined are multidimensional operations such as addition and multiplication.**
+
+This is a package for a pure Julia tools I have found useful in working in higher dimensions.  This repository came about from some informal work in [Advent of Code, 2020, days 11 &#38; 17](https://github.com/jakewilliami/scripts/tree/master/julia/Other/advent_of_code/2020)
 
 ## Examples
 
@@ -14,7 +17,7 @@ julia> ] add MultidimensionalTools
 
 julia> using MultidimensionalTools
 
-julia 
+julia
 
 
 ```

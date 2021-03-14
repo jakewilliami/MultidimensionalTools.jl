@@ -40,6 +40,21 @@ function aresamearrays(A::AbstractArray{T, N}, B::AbstractArray{R, M}) where {T,
 end
 
 @time @testset "MultidimensionalTools.jl" begin
+	# TYPES
+	@test (0, 0, 0) isa AbstractIndex{3}
+	@test CartesianIndex(1, 2, 3, 4, 5) isa AbstractIndex{5}
+	@test [(0, 0), (1, 1), (2, 2)] isa AbstractIndices{2}
+	@test CartesianIndex.([(3, 6, 9, 12), (4, 4, 1, 0)]) isa AbstractIndices{4}
+	@test CartesianIndices([1, 2, 3, 4]) isa AbstractIndices{1}
+	@test CartesianIndices(rand(Int8, 3, 3, 3, 3, 3, 3, 3)) isa AbstractIndices{7}
+	@test (0, 0, 0) isa AbstractIndexOrIndices{3}
+	@test CartesianIndex(1, 2, 3, 4, 5) isa AbstractIndexOrIndices{5}
+	@test [(0, 0), (1, 1), (2, 2)] isa AbstractIndexOrIndices{2}
+	@test CartesianIndex.([(3, 6, 9), (4, 4, 1)]) isa AbstractIndexOrIndices{3}
+	@test CartesianIndices([1, 2, 3, 4]) isa AbstractIndexOrIndices{1}
+	@test CartesianIndices(rand(Int8, 3, 3, 3, 3, 3, 3, 3)) isa AbstractIndexOrIndices{7}
+	
+	# MAIN
     @test n_adjacencies(2) == 8
     @test n_adjacencies(3) == 26
     @test n_adjacencies(17) == 129140162
@@ -47,6 +62,7 @@ end
 	A = Int[-69 -63 -5; 119 67 1; -101 7 -88]
 	@test tryindex(A, (1, 1), (2, 2), (3, 3), (4, 4), (5, 5)) == (-69, 67, -88, nothing, nothing)
 	@test tryindex(A, (1, 1)) == (-69, )
+	# @test tryindex(A, CartesianIndex((1, 1))) == (-69, )
 	T = [(3, 1), (4, 5), (6, 2), (1, 1)]
 	@test extrema_indices(T) == ((1, 6), (1, 5))
 	@test extrema_indices(T...) == ((1, 6), (1, 5))
@@ -56,8 +72,9 @@ end
 	@test append_n_times_backwards(A, 5, 1, dims = 2) == [1 1 1 1 1 -69 -63 -5; 1 1 1 1 1 119 67 1; 1 1 1 1 1 -101 7 -88]
 	@test promote_to_nD(A, 3, 0) == cat([0 0 0; 0 0 0; 0 0 0], [-69 -63 -5; 119 67 1; -101 7 -88], [0 0 0; 0 0 0; 0 0 0], dims = 3)
 	@test promote_to_3D(A, 0) == cat([0 0 0; 0 0 0; 0 0 0], [-69 -63 -5; 119 67 1; -101 7 -88], [0 0 0; 0 0 0; 0 0 0], dims = 3)
-	@test reshape_as_required(A, 0, [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]) == [-69 -63 -5 0 0; 119 67 1 0 0; -101 7 -88 0 0; 0 0 0 0 0; 0 0 0 0 0]
-	# @test reshape_as_required(A, 0, [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (-2, -2)]) == [-69 -63 -5 0 0; 119 67 1 0 0; -101 7 -88 0 0; 0 0 0 0 0; 0 0 0 0 0]
+	# @test expand_as_required(A, 0, CartesianIndex((4, 4))) == [-69 -63 -5 0; 119 67 1 0; -101 7 -88 0; 0 0 0 0]
+	@test expand_as_required(A, 0, [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]) == [-69 -63 -5 0 0; 119 67 1 0 0; -101 7 -88 0 0; 0 0 0 0 0; 0 0 0 0 0]
+	# @test expand_as_required(A, 0, [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (-2, -2)]) == [-69 -63 -5 0 0; 119 67 1 0 0; -101 7 -88 0 0; 0 0 0 0 0; 0 0 0 0 0]
 	@test aresamearrays(adjacencies(A, (2, 2)), [-69, 119, -101, -63, 7, -5, 1, -88])
 	@test aresamearrays(adjacencies(A, (3, 3)), [67, 7, 1])
 	@test aresamearrays(expanded_adjacencies(A, 0, (2, 2)), [-69, 119, -101, -63, 7, -5, 1, -88])
