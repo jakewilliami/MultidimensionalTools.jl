@@ -86,9 +86,9 @@ promote_to_3D(M::AbstractArray{T, N}, fill_elem::T) where {T, N} = promote_to_nD
 promote_to_3D(M::AbstractArray{T, N}) where {T <: Number, N} = promote_to_3D(M, zero(T))
 
 """
-    reduce_dim(A::AbstractArray{T, N})
+    reduce_dim(A::AbstractArray{T, N}; reduce_by::Int = 1)
 
-Reduce an `N`-dimensional array `A` to dimensions `N - 1`.
+Reduce an `N`-dimensional array `A` to dimensions `N - reduce_by`.  Can reduce arbitrarily.  Currently unsafe (i.e., doesn't check that `reduce_by < ndims(A)`.
 
 ```julia
 julia> A = zeros(Int, 3, 3, 3);
@@ -100,11 +100,11 @@ julia> reduce_dims(A)
  [0, 0, 0]  [0, 0, 0]  [0, 0, 0]
 ```
 """
-function reduce_dims(A::AbstractArray{T, N}) where {T, N}
+function reduce_dims(A::AbstractArray{T, N}; reduce_by::Int = 1) where {T, N}
     sz = size(A)
-    out_A = Array{Array{T, 1}, N - 1}(undef, sz[1:(end - 1)])
-    for i in CartesianIndices(sz[1:(end - 1)])
-        out_A[i] = A[i, :]
+    out_A = Array{Array{T, reduce_by}, N - reduce_by}(undef, sz[1:(end - reduce_by)])
+    for i in CartesianIndices(sz[1:(end - reduce_by)])
+        out_A[i] = A[i, (Colon() for _ in reduce_by)...]
     end
     return out_A
 end
