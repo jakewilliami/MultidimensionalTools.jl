@@ -84,3 +84,27 @@ A simple, self-evident wrapper for `promote_to_nD`.   No `fill_elem` assumes tha
 """
 promote_to_3D(M::AbstractArray{T, N}, fill_elem::T) where {T, N} = promote_to_nD(M, 3, fill_elem)
 promote_to_3D(M::AbstractArray{T, N}) where {T <: Number, N} = promote_to_3D(M, zero(T))
+
+"""
+    reduce_dim(A::AbstractArray{T, N})
+
+Reduce an `N`-dimensional array `A` to dimensions `N - 1`.
+
+```julia
+julia> A = zeros(Int, 3, 3, 3);
+
+julia> reduce_dims(A)
+3×3 Matrix{Vector{Int64}}:
+ [0, 0, 0]  [0, 0, 0]  [0, 0, 0]
+ [0, 0, 0]  [0, 0, 0]  [0, 0, 0]
+ [0, 0, 0]  [0, 0, 0]  [0, 0, 0]
+```
+"""
+function reduce_dims(A::AbstractArray{T, N}) where {T, N}
+    sz = size(A)
+    out_A = Array{Array{T, 1}, N - 1}(undef, sz[1:(end - 1)])
+    for i in CartesianIndices(sz[1:(end - 1)])
+        out_A[i] = A[i, :]
+    end
+    return out_A
+end

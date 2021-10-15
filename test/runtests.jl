@@ -1,12 +1,4 @@
-#!/usr/bin/env bash
-    #=
-    exec julia --project="$(realpath $(dirname $(dirname $0)))" --color=yes --startup-file=no -e "include(popfirst!(ARGS))" \
-    "${BASH_SOURCE[0]}" "$@"
-    =#
-
-include(joinpath(dirname(dirname(@__FILE__)), "src", "MultidimensionalTools.jl"))
-
-using .MultidimensionalTools
+using MultidimensionalTools
 using Test
 
 function aresamearrays(A::AbstractVector{T}, B::AbstractVector{R}) where {T, R}
@@ -21,25 +13,12 @@ function aresamearrays(A::AbstractVector{T}, B::AbstractVector{R}) where {T, R}
 	
 	return true
 end
+aresamearrays(A::AbstractArray{T, N}, B::AbstractArray{R, M}) where {T, R, N, M} =
+	aresamearrays(reshape(A, :), reshape(B, :))
 
-"""
-Given two arrays A and B, ensures they have the same elements
-"""
-function aresamearrays(A::AbstractArray{T, N}, B::AbstractArray{R, M}) where {T, R, N, M}
-	A === B && return true
-	length(A) ≠ length(B) && return false
-	
-	for (a, b) in zip(sort(reshape(A, :)), sort(reshape(B, :)))
-	# for (a, b) in zip(sort(A, dims = 1), sort(B, dims = 1))
-		if a ≠ b
-			return false
-		end
-	end
-	
-	return true
-end
+# TESTS
 
-@time @testset "MultidimensionalTools.jl" begin
+@time @testset "MultidimensionalTools.jl Types" begin
 	# TYPES
 	@test (0, 0, 0) isa AbstractIndex{3}
 	@test CartesianIndex(1, 2, 3, 4, 5) isa AbstractIndex{5}
@@ -53,11 +32,14 @@ end
 	@test CartesianIndex.([(3, 6, 9), (4, 4, 1)]) isa AbstractIndexOrIndices{3}
 	@test CartesianIndices([1, 2, 3, 4]) isa AbstractIndexOrIndices{1}
 	@test CartesianIndices(rand(Int8, 3, 3, 3, 3, 3, 3, 3)) isa AbstractIndexOrIndices{7}
-	
+end
+
+@time @testset "MultidimensionalTools.jl Main" begin
 	# MAIN
     @test n_adjacencies(2) == 8
     @test n_adjacencies(3) == 26
     @test n_adjacencies(17) == 129140162
+	@test n_adjacencies(cat([1 1; 1 1], [1 1; 1 1], [1 1; 1 1], dims = 3)) == n_adjacencies(3)
     @test aresamearrays(get_directions(3), [(-1, -1, -1), (0, -1, -1), (1, -1, -1), (-1, 0, -1), (0, 0, -1), (1, 0, -1), (-1, 1, -1), (0, 1, -1), (1, 1, -1), (-1, -1, 0), (0, -1, 0), (1, -1, 0), (-1, 0, 0), (1, 0, 0), (-1, 1, 0), (0, 1, 0), (1, 1, 0), (-1, -1, 1), (0, -1, 1), (1, -1, 1), (-1, 0, 1), (0, 0, 1), (1, 0, 1), (-1, 1, 1), (0, 1, 1), (1, 1, 1)])
 	A = Int[-69 -63 -5; 119 67 1; -101 7 -88]
 	@test tryindex(A, (1, 1), (2, 2), (3, 3), (4, 4), (5, 5)) == (-69, 67, -88, nothing, nothing)
@@ -68,6 +50,7 @@ end
 	@test extrema_indices(T...) == ((1, 6), (1, 5))
 	@test append_n_times(A, 5, 1, dims = 1) == [-69 -63 -5; 119 67 1; -101 7 -88; 1 1 1; 1 1 1; 1 1 1; 1 1 1; 1 1 1]
 	@test append_n_times(A, 5, 1, dims = 2) == [-69 -63 -5 1 1 1 1 1; 119 67 1 1 1 1 1 1; -101 7 -88 1 1 1 1 1]
+	@test append_n_times(A, 2, 1, dims = 3) == cat([-69 -63 -5; 119 67 1; -101 7 -88], [1 1 1; 1 1 1; 1 1 1], [1 1 1; 1 1 1; 1 1 1], dims = 3)
 	@test append_n_times_backwards(A, 5, 1, dims = 1) == [1 1 1; 1 1 1; 1 1 1; 1 1 1; 1 1 1; -69 -63 -5; 119 67 1; -101 7 -88]
 	@test append_n_times_backwards(A, 5, 1, dims = 2) == [1 1 1 1 1 -69 -63 -5; 1 1 1 1 1 119 67 1; 1 1 1 1 1 -101 7 -88]
 	@test promote_to_nD(A, 3, 0) == cat([0 0 0; 0 0 0; 0 0 0], [-69 -63 -5; 119 67 1; -101 7 -88], [0 0 0; 0 0 0; 0 0 0], dims = 3)
@@ -89,4 +72,7 @@ end
 	@test aresamearrays(global_adjacencies_indices(promote_to_3D(A, 7), (3, 3, 1), 7), [(2, 2, 2), (2, 3, 2), (3, 3, 2)])
 	@test aresamearrays(global_adjacencies(A, (3, 3), 67), [-69, 7, 1])
 	@test global_n_adjacent_to(A, (3, 3), -69, 67) == 1
+    @test aresamearrays(reduce_dims(zeros(Int, 3, 3, 3)), fill(zeros(Int, 3), 3, 3))
+    @test aresamearrays(reduce_dims(zeros(Int, 20, 3, 10, 100)), fill(zeros(Int, 100), 20, 3, 10))
+    @test aresamearrays(reduce_dims(zeros(Int, 3, 3)), fill(zeros(Int, 3), 3))
 end # end testset

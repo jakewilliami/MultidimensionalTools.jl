@@ -10,7 +10,7 @@ export n_adjacencies, extrema_indices, tryindex, get_directions
 export append_n_times, append_n_times_backwards, promote_to_nD, promote_to_3D,
     expand_as_required, adjacencies, expanded_adjacencies, n_adjacent_to,
     expanded_n_adjacent_to, global_adjacencies_indices, global_adjacencies,
-    global_n_adjacent_to
+    global_n_adjacent_to, reduce_dims
     
 _IterableList{T} = Union{AbstractVector{T}, NTuple{N, T}} where N
 AbstractIndex{N} = Union{NTuple{N, T}, CartesianIndex{N}} where {T <: Integer}
@@ -108,6 +108,6 @@ is2Dsquare(A::AbstractArray{T, N}...) where {T, N} = Bool[is2Dsquare(a) for a in
 
 include("generic.jl")
 include("adjacent.jl")
-include("multilinalg.jl")
+# include("multilinalg.jl")
 
 end # end module
