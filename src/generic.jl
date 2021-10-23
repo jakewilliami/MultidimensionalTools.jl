@@ -85,6 +85,12 @@ A simple, self-evident wrapper for `promote_to_nD`.   No `fill_elem` assumes tha
 promote_to_3D(M::AbstractArray{T, N}, fill_elem::T) where {T, N} = promote_to_nD(M, 3, fill_elem)
 promote_to_3D(M::AbstractArray{T, N}) where {T <: Number, N} = promote_to_3D(M, zero(T))
 
+function _front_n(t::NTuple{N, T}, n::Int, i::Int = 0) where {N, T}
+    i == n && return t
+    return _front_n(Base.front(t), n, i + 1)
+end
+Base.front(t::Tuple, n::Int) = _front_n(t, m)
+
 """
     reduce_dim(A::AbstractArray{T, N}; reduce_by::Int = 1)
 
@@ -102,8 +108,8 @@ julia> reduce_dims(A)
 """
 function reduce_dims(A::AbstractArray{T, N}; reduce_by::Int = 1) where {T, N}
     sz = size(A)
-    out_A = Array{Array{T, reduce_by}, N - reduce_by}(undef, sz[1:(end - reduce_by)])
-    for i in CartesianIndices(sz[1:(end - reduce_by)])
+    out_A = Array{Array{T, reduce_by}, N - reduce_by}(undef, Base.front(sz, reduce_by))
+    for i in CartesianIndices(Base.front(sz, reduce_by))
         out_A[i] = A[i, (Colon() for _ in reduce_by)...]
     end
     return out_A
