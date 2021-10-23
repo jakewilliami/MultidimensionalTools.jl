@@ -7,12 +7,24 @@
     n_adjacencies(M::AbstractArray{T, N}) -> Integer
     n_adjacencies(I::AbstractIndexOrIndices{T, N}) -> Integer
 
-Given a matrix or dimension, returns the number of elements adjacent to any given element in an infinite lattice/matrix (i.e., not including edges).  For edges, see `adjacencies`).
+Given a matrix or dimension, returns the number of elements adjacent to any given element in an infinite lattice/matrix (i.e., not bounded by the edges of the array).  For edges, see `adjacencies`.
 """
 n_adjacencies(dim::Integer) = 3^dim - 1
 n_adjacencies(M::AbstractArray{T, N}) where {T, N} = n_adjacencies(ndims(M))
 n_adjacencies(I::AbstractIndexOrIndices{N}) where {N} = n_adjacencies(length(first(I)))
 # n_adjacencies(M::AbstractArray{T, N}) where {T, N} = n_adjacencies(N)
+
+"""
+    n_adjacencies(dim::Integer) -> Integer
+    n_adjacencies(M::AbstractArray{T, N}) -> Integer
+    n_adjacencies(I::AbstractIndexOrIndices{T, N}) -> Integer
+
+Given a matrix or dimension, returns the number of faces of the structure.
+"""
+n_faces(dim::Integer) = 2dim
+n_faces(M::AbstractArray{T, N}) where {T, N} = n_faces(ndims(M))
+n_faces(I::AbstractIndexOrIndices{N}) where {N} = n_faces(length(first(I)))
+# n_faces(M::AbstractArray{T, N}) where {T, N} = n_faces(N)
 
 """
 Repeats a specified value n many times along the specified dimension.  If no `fill_elem` is given, and the element type of the matrix is a number, fills with zero.
@@ -89,7 +101,7 @@ function _front_n(t::NTuple{N, T}, n::Int, i::Int = 0) where {N, T}
     i == n && return t
     return _front_n(Base.front(t), n, i + 1)
 end
-Base.front(t::Tuple, n::Int) = _front_n(t, m)
+Base.front(t::Tuple, n::Int) = _front_n(t, n)
 
 """
     reduce_dim(A::AbstractArray{T, N}; reduce_by::Int = 1)
@@ -107,10 +119,10 @@ julia> reduce_dims(A)
 ```
 """
 function reduce_dims(A::AbstractArray{T, N}; reduce_by::Int = 1) where {T, N}
-    sz = size(A)
-    out_A = Array{Array{T, reduce_by}, N - reduce_by}(undef, Base.front(sz, reduce_by))
-    for i in CartesianIndices(Base.front(sz, reduce_by))
-        out_A[i] = A[i, (Colon() for _ in reduce_by)...]
+    reduced_sz = Base.front(size(A), reduce_by)
+    out_A = Array{Array{T, reduce_by}, N - reduce_by}(undef, reduced_sz)
+    for i in CartesianIndices(reduced_sz)
+        out_A[i] = A[i, (Colon() for _ in 1:reduce_by)...]
     end
     return out_A
 end

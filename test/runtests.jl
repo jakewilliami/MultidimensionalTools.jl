@@ -39,7 +39,13 @@ end
     @test n_adjacencies(2) == 8
     @test n_adjacencies(3) == 26
     @test n_adjacencies(17) == 129140162
+    @test n_adjacencies(rand(fill(1, 17)...)) == 129140162
 	@test n_adjacencies(cat([1 1; 1 1], [1 1; 1 1], [1 1; 1 1], dims = 3)) == n_adjacencies(3)
+    @test n_faces(1) == 2 # a line has two vertices
+    @test n_faces(2) == 4 # a square has four edges
+    @test n_faces(3) == 6 # a cube has six faces
+    @test n_faces(cat([1 1; 1 1], [1 1; 1 1], [1 1; 1 1], dims = 3)) == 6 # ibid
+    @test n_faces(rand(fill(1, 17)...)) == 34
     @test aresamearrays(get_directions(3), [(-1, -1, -1), (0, -1, -1), (1, -1, -1), (-1, 0, -1), (0, 0, -1), (1, 0, -1), (-1, 1, -1), (0, 1, -1), (1, 1, -1), (-1, -1, 0), (0, -1, 0), (1, -1, 0), (-1, 0, 0), (1, 0, 0), (-1, 1, 0), (0, 1, 0), (1, 1, 0), (-1, -1, 1), (0, -1, 1), (1, -1, 1), (-1, 0, 1), (0, 0, 1), (1, 0, 1), (-1, 1, 1), (0, 1, 1), (1, 1, 1)])
 	A = Int[-69 -63 -5; 119 67 1; -101 7 -88]
 	@test tryindex(A, (1, 1), (2, 2), (3, 3), (4, 4), (5, 5)) == (-69, 67, -88, nothing, nothing)
