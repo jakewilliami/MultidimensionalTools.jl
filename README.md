@@ -26,5 +26,9 @@ julia
 
 ```
 
+## Citation
+
+If your research depends on MultidimensionalTools.jl, please consider giving us a formal citation: [`citation.bib`](./citation.bib).
+
 [code-style-img]: https://img.shields.io/badge/code%20style-blue-4495d1.svg
 [code-style-url]: https://github.com/invenia/BlueStyle
