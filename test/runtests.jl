@@ -143,4 +143,8 @@ end
         reduce_dims(zeros(Int, 20, 3, 10, 100)), fill(zeros(Int, 100), 20, 3, 10)
     )
     @test aresamearrays(reduce_dims(zeros(Int, 3, 3)), fill(zeros(Int, 3), 3))
+    @test aresamearrays(
+        reduce_dims(zeros(Int, 3, 3, 3); reduce_by = 0), zeros(Int, 3, 3, 3)
+    )  # reduce by nothing should not change the array
+    @test_throws DomainError reduce_dims(zeros(Int, 3, 3, 3); reduce_by = -1)  # cannot reduce by a negative
 end # end testset
