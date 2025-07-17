@@ -43,11 +43,15 @@ julia> append_n_times(A, 2, Int8(3), dims = 1) # repeat the value 3 twice along 
    3   3
 ```
 """
-function append_n_times(M::AbstractArray{T, N}, n::Integer, fill_elem::T; dims::Integer = 1) where {T, N}
+function append_n_times(
+    M::AbstractArray{T, N}, n::Integer, fill_elem::T; dims::Integer = 1
+) where {T, N}
     sz = ntuple(d -> d == dims ? n : size(M, d), max(N, dims))
     return cat(M, fill(fill_elem, sz); dims = dims)
 end
-append_n_times(M::AbstractArray{T, N}, n::Integer, dims::Integer = 1) where {T <: Number, N} = append_n_times(M, n, zero(T); dims = dims)
+append_n_times(
+    M::AbstractArray{T, N}, n::Integer, dims::Integer = 1
+) where {T <: Number, N} = append_n_times(M, n, zero(T); dims = dims)
 
 """
 ```julia
@@ -64,11 +68,15 @@ julia> append_n_times_backwards(A, 2, Int8(3), dims = 1) # repeat the value 3 tw
  -47  54
 ```
 """
-function append_n_times_backwards(M::AbstractArray{T, N}, n::Integer, fill_elem::T; dims::Integer = 1) where {T, N}
+function append_n_times_backwards(
+    M::AbstractArray{T, N}, n::Integer, fill_elem::T; dims::Integer = 1
+) where {T, N}
     sz = ntuple(d -> d == dims ? n : size(M, d), max(N, dims))
     return cat(fill(fill_elem, sz), M; dims = dims)
 end
-append_n_times_backwards(M::AbstractArray{T, N}, n::Integer, dims::Integer = 1) where {T <: Number, N} = append_n_times(M, n, zero(T); dims = dims)
+append_n_times_backwards(
+    M::AbstractArray{T, N}, n::Integer, dims::Integer = 1
+) where {T <: Number, N} = append_n_times(M, n, zero(T); dims = dims)
 
 """
     function promote_to_nD(M::AbstractArray{T, N}, n::Integer, fill_elem::T)
@@ -77,24 +85,27 @@ Assumes the given matrix M is an (n - 1) dimensional slice of an n-dimensional s
 """
 function promote_to_nD(M::AbstractArray{T, N}, n::Integer, fill_elem::T) where {T, N}
     ndims(M) == n && return M
-    n < ndims(M) && throw(error("Cannot reduce the number of dimensions this array has.  See `resize`."))
-    
+    n < ndims(M) &&
+        throw(error("Cannot reduce the number of dimensions this array has.  See `resize`."))
+
     for d in (ndims(M) + 1):n
         M = append_n_times(M, 1, fill_elem, dims = d)
         M = append_n_times_backwards(M, 1, fill_elem, dims = d)
     end
-    
+
     return M
 end
-promote_to_nD(M::AbstractArray{T, N}, n::Integer) where {T <: Number, N} = promote_to_nD(M, n, zero(T))
+promote_to_nD(M::AbstractArray{T, N}, n::Integer) where {T <: Number, N} =
+    promote_to_nD(M, n, zero(T))
 
 """
     promote_to_3D(M::AbstractArray{T, N}, fill_elem::T)
     promote_to_3D(M::AbstractArray{T, N}) where T <: Number
-    
+
 A simple, self-evident wrapper for `promote_to_nD`.   No `fill_elem` assumes that the value is zero (if it can be).
 """
-promote_to_3D(M::AbstractArray{T, N}, fill_elem::T) where {T, N} = promote_to_nD(M, 3, fill_elem)
+promote_to_3D(M::AbstractArray{T, N}, fill_elem::T) where {T, N} =
+    promote_to_nD(M, 3, fill_elem)
 promote_to_3D(M::AbstractArray{T, N}) where {T <: Number, N} = promote_to_3D(M, zero(T))
 
 function _front_n(t::NTuple{N, T}, n::Int, i::Int = 0) where {N, T}
@@ -119,6 +130,9 @@ julia> reduce_dims(A)
 ```
 """
 function reduce_dims(A::AbstractArray{T, N}; reduce_by::Int = 1) where {T, N}
+    reduce_by < 0 &&
+        throw(DomainError("cannot reduce the demensions of an array by a negative value"))
+    iszero(reduce_by) && return A
     reduced_sz = Base.front(size(A), reduce_by)
     out_A = Array{Array{T, reduce_by}, N - reduce_by}(undef, reduced_sz)
     for i in CartesianIndices(reduced_sz)

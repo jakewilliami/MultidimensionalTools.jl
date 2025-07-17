@@ -28,18 +28,16 @@ end
 =#
 
 function _first_cayley_hyperdet(A::AbstractArray{T, N}) where {T <: Real, N} # usually denoted "det₀"
-
 end
 
 function _second_cayley_hyperdet(A::AbstractArray{T, N}) where {T <: Real, N} # usually denoted "Det."
-    
 end
 
 function LinearAlgebra.det(A::AbstractArray{T, N}) where {T <: Real, N}
     N < 3 && return det(A)
     iseven(ndims(A)) && return _first_cayley_hyperdet(A)
     # size(A) == ntuple(_ -> 2, ndims(A)) && return _first_cayley_hyperdet(A)
-    
+
     return "hello"
 end
 
@@ -60,10 +58,6 @@ function inv(A::StridedMatrix{T}) where T
     end
     return Ai
 end
-
-
-
-
 
 =#
 # code lowered:
@@ -255,27 +249,30 @@ function get_I(S::NTuple{N, T}) where {T <: Integer, N}
             A[i] = 1
         end
     end
-    
+
     return A
 end
 
-function _promote_I(S::NTuple{N, T}) where {T  <: Integer, N}
-    return T.(reshape(repeat(I(first(S)), inner = ntuple(i -> i == 2 ? first(S) : 1, first(S))), ntuple(_ -> first(S), N)))
+function _promote_I(S::NTuple{N, T}) where {T <: Integer, N}
+    return T.(reshape(
+        repeat(I(first(S)), inner = ntuple(i -> i == 2 ? first(S) : 1, first(S))),
+        ntuple(_ -> first(S), N),
+    ))
 end
 
 function LinearAlgebra.I(S::NTuple{N, T}; dims::Int = 2) where {T <: Integer, N}
-    allequal(S) || (s = rand(S); throw(DimensionMismatch("""
-        The identity array should be square.  Size received: $(size(A)).  Example size: $(ntuple(_ -> s, length(A))).
-    """)))
-    
+    allequal(S) || (s = rand(S);
+    throw(DimensionMismatch("""
+    The identity array should be square.  Size received: $(size(A)).  Example size: $(ntuple(_ -> s, length(A))).
+""")))
+
     dims == 2 && return _promote_I(S)
     return I(S, dims = (dims - 1))
-    
+
     # return reshape(repeat(I(first(S)), inner = ntuple(i -> i == 2 ? first(S) : 1, first(S))), ntuple(_ -> first(S), N))
-    
+
     # reshape(repeat(I(3), inner = (1, 3, 1)), (3, 3, 3))
-    
-    
+
     # cat(Iterators.repeated(I(3), 3)..., dims = 1)
     #
     # sz = ntuple(d -> d == dims ? n : size(M, d), max(N, dims))
@@ -284,25 +281,21 @@ end
 LinearAlgebra.I(A::Integer...) = LinearAlgebra.I(A)
 
 LinearAlgebra.I(N::Integer...) =
-
-function _inv_nD(A::AbstractArray{T, N}) where {T <: Real, N}
-    issquare(A) || (s = rand(size(A)); throw(DimensionMismatch("""
-        The inverse is defined as the matrix required to multiply with the input matrix to produce an identity matrix.  The identity matrix is square, so you need to ensure every dimension of the input array has the same size.  Size received: $(size(A)).  Example size: $(ntuple(_ -> s, ndims(A))).
-    """)))
-end
+    function _inv_nD(A::AbstractArray{T, N}) where {T <: Real, N}
+        issquare(A) || (s = rand(size(A));
+        throw(DimensionMismatch("""
+    The inverse is defined as the matrix required to multiply with the input matrix to produce an identity matrix.  The identity matrix is square, so you need to ensure every dimension of the input array has the same size.  Size received: $(size(A)).  Example size: $(ntuple(_ -> s, ndims(A))).
+""")))
+    end
 
 function LinearAlgebra.inv(A::AbstractArray{T, N}) where {T <: Real, N}
     N < 3 && return inv(A)
     return _inv_nD(A)
 end
 
-
-
-
-
 import Base: *
 @generated function *(A::AbstractArray{T, N}, B::AbstractArray{T, N}) where {T, N}
     N < 3 && return :(A * B)
     C = transpose(B)
-    return :(@matmul M[i,j] := sum(k) A[i, k] * C[j, k])
+    return :(@matmul M[i, j] := sum(k) A[i, k] * C[j, k])
 end

@@ -9,11 +9,7 @@ Documenter.makedocs(
     highlightsig = true,
     sitename = "MultidimensionalTools Documentation",
     expandfirst = [],
-    pages = [
-        "Index" => "index.md",
-    ]
+    pages = ["Index" => "index.md"],
 )
 
-deploydocs(;
-    repo  =  "github.com/jakewilliami/MultidimensionalTools.jl.git",
-)
+deploydocs(; repo = "github.com/jakewilliami/MultidimensionalTools.jl.git",)

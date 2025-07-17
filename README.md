@@ -16,7 +16,7 @@ This is a package for a pure Julia tools I have found useful in working in highe
 
 ## Examples
 
-```julia
+```julia-repl
 julia> ] add MultidimensionalTools
 
 julia> using MultidimensionalTools

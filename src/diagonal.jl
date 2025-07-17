@@ -9,18 +9,13 @@
 # Diagonal(a::AbstractArray{T, N}) where {T, N} = Diagonal{T, typeof(a)}(a)
 # Diagonal{T, N}(a::AbstractArray) where {T, N} = Diagonal(convert(AbstractArray{T, N}, a)::AbstractArray{T, N})
 
-
-
 function LinearAlgebra.diagind(A::AbstractArray)
     return CartesianIndex{ndims(A)}[i for i in CartesianIndices(A) if allequal(i.I)]
 end
 
 LinearAlgebra.diag(A::AbstractArray) = A[diagind(A)]
 
-
-
 using Einsum
-
 
 #=
 If I were to extend LinearAlgebra.diag for an arbitrary dimension, what would it look like?  Would it be all of the indices that are the same (thus returning a vector)?  I.e., (1, 1, …, 1), (2, 2, …, 2), …, (n, n, …, n)?  Or would it be a diagonal hyperplane that is one dimension less than the given matrix?
@@ -70,8 +65,8 @@ julia> diag_alt(B)
 ```
 """
 @generated function diag_alt(A::AbstractArray)
-      I = Symbol[:i for _ in 1:ndims(A)]
-      return :(@einsum B[i] := A[$(I...)]) # e.g., @einsum y[i] := x[i,i,i]
+    I = Symbol[:i for _ in 1:ndims(A)]
+    return :(@einsum B[i] := A[$(I...)]) # e.g., @einsum y[i] := x[i,i,i]
 end
 
 """
@@ -82,22 +77,21 @@ diag_hyperplaneplane(A::AbstractArray)
 Given an array of arbitrary dimesions, return the diagonal hyperplane.
 """
 @generated function diag_hyperplaneplane(A::AbstractArray{T, N}) where {T, N}
-      N < 3 && return :(diag_alt(A))
-      I = vcat(Symbol[:i for _ in 1:(ndims(A) - 1)], :k)
-      K = vcat(Symbol[:i for _ in 1:(ndims(A) - 2)], :k)
-      return :(@einsum B[$(K...)] := A[$(I...)]) # e.g., @einsum y[i,k] := x[i,i,k]
+    N < 3 && return :(diag_alt(A))
+    I = vcat(Symbol[:i for _ in 1:(ndims(A) - 1)], :k)
+    K = vcat(Symbol[:i for _ in 1:(ndims(A) - 2)], :k)
+    return :(@einsum B[$(K...)] := A[$(I...)]) # e.g., @einsum y[i,k] := x[i,i,k]
 end
 
-
 function diagind_alt(A::AbstractArray)
-      ishypercube(A) || throw(DimensionMismatch("Error trying to access the diagonal indices from a non-diagonalisable array (i.e., input array is not a hypercube)"))
-      return map(i -> CartesianIndex(ntuple(d -> i, ndims(A))), axes(A, 1))
+    ishypercube(A) ||
+        throw(DimensionMismatch("Error trying to access the diagonal indices from a non-diagonalisable array (i.e., input array is not a hypercube)"))
+    return map(i -> CartesianIndex(ntuple(d -> i, ndims(A))), axes(A, 1))
 end
 
 function diag_alt_alt(A::AbstractArray)
-      return A[diagind_alt(A)]
+    return A[diagind_alt(A)]
 end
-
 
 #=
 julia> @pretty @matmul M[i,j] := sum(k) A[i, k] * B[j, k]

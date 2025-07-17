@@ -7,14 +7,25 @@ export AbstractIndex, AbstractIndices, AbstractIndexOrIndices
 # helper functions
 export n_adjacencies, n_faces, extrema_indices, tryindex, get_directions
 # main functions
-export append_n_times, append_n_times_backwards, promote_to_nD, promote_to_3D,
-    expand_as_required, adjacencies, expanded_adjacencies, n_adjacent_to,
-    expanded_n_adjacent_to, global_adjacencies_indices, global_adjacencies,
-    global_n_adjacent_to, reduce_dims
-    
-_IterableList{T} = Union{AbstractVector{T}, NTuple{N, T}} where N
+export append_n_times,
+    append_n_times_backwards,
+    promote_to_nD,
+    promote_to_3D,
+    expand_as_required,
+    adjacencies,
+    expanded_adjacencies,
+    n_adjacent_to,
+    expanded_n_adjacent_to,
+    global_adjacencies_indices,
+    global_adjacencies,
+    global_n_adjacent_to,
+    reduce_dims
+
+_IterableList{T} = Union{AbstractVector{T}, NTuple{N, T}} where {N}
 AbstractIndex{N} = Union{NTuple{N, T}, CartesianIndex{N}} where {T <: Integer}
-AbstractIndices{N}  = Union{AbstractVector{I}, NTuple{M, I}, CartesianIndices{N, NTuple{N, Base.OneTo{T}}}} where {I <: AbstractIndex{N}, T <: Integer, M}
+AbstractIndices{N} = Union{
+    AbstractVector{I}, NTuple{M, I}, CartesianIndices{N, NTuple{N, Base.OneTo{T}}}
+} where {I <: AbstractIndex{N}, T <: Integer, M}
 AbstractIndexOrIndices{N} = Union{AbstractIndex{N}, AbstractIndices{N}}
 
 """
@@ -25,10 +36,13 @@ Simply returns the zero tuple of a given dimension.
 """
 𝟘(n::T) where {T <: Integer} = ntuple(_ -> zero(T), n)
 
-_tryindex(M::AbstractArray, inds::CartesianIndex...) where {T, N} = Tuple((checkbounds(Bool, M, i) ? M[i] : nothing) for i in inds)
-_tryindex(M::AbstractArray, inds::AbstractArray{CartesianIndex}) where {T, N} = _tryindex(M, inds...)
+_tryindex(M::AbstractArray, inds::CartesianIndex...) where {T, N} =
+    Tuple((checkbounds(Bool, M, i) ? M[i] : nothing) for i in inds)
+_tryindex(M::AbstractArray, inds::AbstractArray{CartesianIndex}) where {T, N} =
+    _tryindex(M, inds...)
 _tryindex(M::AbstractArray, inds::NTuple...) = _tryindex(M, CartesianIndex.(inds)...)
-_tryindex(M::AbstractArray, inds::AbstractArray{NTuple}) where {T, N} = _tryindex(M, inds...)
+_tryindex(M::AbstractArray, inds::AbstractArray{NTuple}) where {T, N} =
+    _tryindex(M, inds...)
 
 """
     tryindex(M::AbstractArray{T, N}, inds::AbstractIndex{N}}...)
@@ -60,7 +74,7 @@ julia> T = [(3, 1), (4, 5), (6, 2), (1, 1)]
  (4, 5)
  (6, 2)
  (1, 1)
- 
+
 julia> extrema_indices(T)
 1×2 Array{Tuple{Int64,Int64},2}:
 (1, 6)  (1, 5)
@@ -73,7 +87,7 @@ extrema_indices(i::AbstractIndex{N}...) where {N} = _extrema_indices(i)
 extrema_indices(A::AbstractArray{T, N}) where {T, N} = size(A)
 extrema_indices(A::AbstractArray{T, N}...) where {T, N} = _extrema_indices(size.(A))
 
-@inline function allequal(A::_IterableList{T}) where T
+@inline function allequal(A::_IterableList{T}) where {T}
     length(A) < 2 && return true
 
     @inbounds for i in 2:length(A)
