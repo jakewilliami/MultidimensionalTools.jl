@@ -36,9 +36,9 @@ Simply returns the zero tuple of a given dimension.
 """
 𝟘(n::T) where {T <: Integer} = ntuple(_ -> zero(T), n)
 
-_tryindex(M::AbstractArray, inds::CartesianIndex...) where {T, N} =
+_tryindex(M::AbstractArray, inds::CartesianIndex...) where {T} =
     Tuple((checkbounds(Bool, M, i) ? M[i] : nothing) for i in inds)
-_tryindex(M::AbstractArray, inds::AbstractArray{CartesianIndex}) where {T, N} =
+_tryindex(M::AbstractArray, inds::AbstractArray{CartesianIndex}) where {T} =
     _tryindex(M, inds...)
 _tryindex(M::AbstractArray, inds::NTuple...) = _tryindex(M, CartesianIndex.(inds)...)
 _tryindex(M::AbstractArray, inds::AbstractArray{NTuple}) where {T, N} =
