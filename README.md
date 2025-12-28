@@ -8,9 +8,13 @@
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 ![Project Status](https://img.shields.io/badge/status-maturing-green)
 
-**This package is still developing and may need peer review from mathematicians.**
+> [!WARNING]
+>
+> **This package is still developing.  Its API may change, and the algorithms may need peer review from other mathematicians.**
 
-**Important note: still being defined are multidimensional operations such as addition and multiplication.**
+> [!NOTE]
+>
+> **Important note: still being defined are multidimensional operations such as addition and multiplication.**
 
 This is a package for a pure Julia tools I have found useful in working in higher dimensions.  This repository came about from some informal work in [Advent of Code, 2020, days 11 &#38; 17](https://github.com/jakewilliami/scripts/tree/master/julia/Other/advent_of_code/2020)
 
