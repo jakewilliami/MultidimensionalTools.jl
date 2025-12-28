@@ -25,9 +25,20 @@ julia> ] add MultidimensionalTools
 
 julia> using MultidimensionalTools
 
-julia
+julia> M = rand(rand(2:10, 6)...);  # random 6-dimensional array
 
+julia> i = rand(CartesianIndices(M));  # random index
 
+julia> dirs = get_directions(M);  # get all directions in 6 dimensions
+
+julia> length(dirs)
+728
+
+julia> j = i + rand(dir);
+
+julia> tryindex(M, j)
+
+julia> adjacencies(M, Tuple(i));
 ```
 
 ## Citation
